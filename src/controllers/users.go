@@ -5,6 +5,7 @@ import (
 	"api/src/models"
 	"api/src/repositories"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -29,7 +30,13 @@ func Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	repository := repositories.UserRepository(db)
-	repository.Create(user)
+	userId, error := repository.Create(user)
+
+	if error != nil {
+		log.Fatal(error)
+	}
+
+	w.Write([]byte(fmt.Sprintf("Ususário criado com succeso ID: %d", userId)))
 }
 
 // ListAll lista todos os usuários do banco
