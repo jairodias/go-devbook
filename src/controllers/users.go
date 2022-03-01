@@ -14,15 +14,15 @@ func ListAll(w http.ResponseWriter, r *http.Request) {
 
 // SearchById busca um único usuário no banco de acordo com o id passado
 func SearchById(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando usuário"))
+	w.Write([]byte("Buscando usuário"))
 }
 
 // Update alterar as informações do id passado no route params
 func Update(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando usuário"))
+	w.Write([]byte("Alterando usuário"))
 }
 
 // Delete exclui o registro de um usuário dentro da base de dados
 func Detele(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Criando usuário"))
+	w.Write([]byte("Deletando usuário"))
 }
