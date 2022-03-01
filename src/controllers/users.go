@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // Create insere um usuário no banco de dados
@@ -48,7 +49,22 @@ func Create(w http.ResponseWriter, r *http.Request) {
 
 // ListAll lista todos os usuários do banco
 func ListAll(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Listando todos os usuarios"))
+	nameOrNick := strings.ToLower(r.URL.Query().Get("user"))
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+
+	repositories := repositories.UserRepository(db)
+	users, error := repositories.Search(nameOrNick)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, users)
 }
 
 // SearchById busca um único usuário no banco de acordo com o id passado
