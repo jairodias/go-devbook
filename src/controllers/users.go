@@ -28,7 +28,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if error = user.Prepare(); error != nil {
+	if error = user.Prepare("create"); error != nil {
 		responses.Error(w, http.StatusBadRequest, error)
 		return
 	}
@@ -100,7 +100,45 @@ func SearchById(w http.ResponseWriter, r *http.Request) {
 
 // Update alterar as informações do id passado no route params
 func Update(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Alterando usuário"))
+	params := mux.Vars(r)
+	userID, error := strconv.ParseUint(params["id"], 10, 64)
+
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	body, error := ioutil.ReadAll(r.Body)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	var user models.User
+	if error = json.Unmarshal(body, &user); error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	if error = user.Prepare("update"); error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.UserRepository(db)
+	if error = repository.Update(userID, user); error != nil {
+		responses.JSON(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	responses.JSON(w, http.StatusNoContent, nil)
 }
 
 // Delete exclui o registro de um usuário dentro da base de dados

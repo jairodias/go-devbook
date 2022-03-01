@@ -17,8 +17,8 @@ type User struct {
 }
 
 // Prepare vai chamar os métodos para validar e formatar os dados do usuário recebido
-func (user *User) Prepare() error {
-	if error := user.validate(); error != nil {
+func (user *User) Prepare(etapa string) error {
+	if error := user.validate(etapa); error != nil {
 		return error
 	}
 
@@ -26,7 +26,7 @@ func (user *User) Prepare() error {
 	return nil
 }
 
-func (user *User) validate() error {
+func (user *User) validate(etapa string) error {
 	if user.Name == "" {
 		return errors.New("name is required")
 	}
@@ -39,7 +39,7 @@ func (user *User) validate() error {
 		return errors.New("email is required")
 	}
 
-	if user.Password == "" {
+	if etapa == "create" && user.Password == "" {
 		return errors.New("password is required")
 	}
 

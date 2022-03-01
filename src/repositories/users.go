@@ -77,6 +77,7 @@ func (repository users) Search(nameOrNick string) ([]models.User, error) {
 	return users, nil
 }
 
+// FindById busca um usuário de acordo com o id informado
 func (repository users) FindById(ID uint64) (models.User, error) {
 	line, error := repository.db.Query(
 		"SELECT id, name, nick, email, created_at FROM users WHERE id = ?",
@@ -101,4 +102,21 @@ func (repository users) FindById(ID uint64) (models.User, error) {
 	}
 
 	return user, nil
+}
+
+func (repository users) Update(ID uint64, user models.User) error {
+	statement, error := repository.db.Prepare(
+		"UPDATE users SET name = ?, nick = ?, email = ? WHERE id = ?",
+	)
+
+	if error != nil {
+		return error
+	}
+	defer statement.Close()
+
+	if _, error = statement.Exec(user.Name, user.Nick, user.Email, ID); error != nil {
+		return error
+	}
+
+	return nil
 }
