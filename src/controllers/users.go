@@ -8,7 +8,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // Create insere um usuário no banco de dados
@@ -69,7 +72,30 @@ func ListAll(w http.ResponseWriter, r *http.Request) {
 
 // SearchById busca um único usuário no banco de acordo com o id passado
 func SearchById(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Buscando usuário"))
+	params := mux.Vars(r)
+
+	userID, error := strconv.ParseUint(params["id"], 10, 64)
+	if error != nil {
+		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	db, error := database.Connect()
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+	defer db.Close()
+
+	repository := repositories.UserRepository(db)
+	user, error := repository.FindById(userID)
+
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, user)
 }
 
 // Update alterar as informações do id passado no route params
