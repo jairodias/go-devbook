@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"api/src/authenticate"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
@@ -43,5 +44,11 @@ func Authenticate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responses.JSON(w, http.StatusOK, nil)
+	token, error := authenticate.TokenGenerate(userDatabase.ID)
+	if error != nil {
+		responses.Error(w, http.StatusInternalServerError, error)
+		return
+	}
+
+	responses.JSON(w, http.StatusOK, token)
 }

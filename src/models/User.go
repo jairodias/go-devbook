@@ -69,4 +69,6 @@ func (user *User) format(etapa string) error {
 
 		user.Password = string(passwordHashed)
 	}
+
+	return nil
 }

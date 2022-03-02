@@ -15,6 +15,9 @@ var (
 
 	// Port é a porta onde a API vai estar rodando
 	Port = 0
+
+	// SecretKey é a chave que vai ser usada para assinar o token
+	SecretKey []byte
 )
 
 // Load vai inicializar as variáveis de ambiente
@@ -33,4 +36,6 @@ func Load() {
 
 	StringBDConnection = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
 		os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_DATABASE"))
+
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }
