@@ -1,6 +1,7 @@
 package models
 
 import (
+	"api/src/security"
 	"errors"
 	"strings"
 	"time"
@@ -24,7 +25,10 @@ func (user *User) Prepare(etapa string) error {
 		return error
 	}
 
-	user.format()
+	if error := user.format(etapa); error != nil {
+		return error
+	}
+
 	return nil
 }
 
@@ -52,8 +56,17 @@ func (user *User) validate(etapa string) error {
 	return nil
 }
 
-func (user *User) format() {
+func (user *User) format(etapa string) error {
 	user.Name = strings.TrimSpace(user.Name)
 	user.Nick = strings.TrimSpace(user.Nick)
 	user.Email = strings.TrimSpace(user.Email)
+
+	if etapa == "create" {
+		passwordHashed, error := security.Hash(user.Password)
+		if error != nil {
+			return error
+		}
+
+		user.Password = string(passwordHashed)
+	}
 }
