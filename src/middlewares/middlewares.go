@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Logger escrever informações da requisição no terminal
+// Logger escrever informações da requisição como log no terminal
 func Logger(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		log.Printf("\n %s %s %s", r.Method, r.RequestURI, r.Host)
