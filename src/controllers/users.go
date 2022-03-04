@@ -1,11 +1,13 @@
 package controllers
 
 import (
+	"api/src/authenticate"
 	"api/src/database"
 	"api/src/models"
 	"api/src/repositories"
 	"api/src/responses"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -105,6 +107,17 @@ func Update(w http.ResponseWriter, r *http.Request) {
 
 	if error != nil {
 		responses.Error(w, http.StatusBadRequest, error)
+		return
+	}
+
+	userIdToken, error := authenticate.ExtractUserID(r)
+	if error != nil {
+		responses.Error(w, http.StatusUnauthorized, error)
+		return
+	}
+
+	if userID != userIdToken {
+		responses.Error(w, http.StatusForbidden, errors.New("não é possível atualizar um perfil que não seja o seu"))
 		return
 	}
 
